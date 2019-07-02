@@ -1,0 +1,31 @@
+{
+  "name": "dp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "email-validator": "^2.0.4",
+    "google-libphonenumber": "^3.2.2",
+    "intel": "^1.2.0",
+    "koa": "^2.7.0",
+    "koa-body": "^1.7.0",
+    "koa-router": "^7.4.0",
+    "mongoose": "^5.5.14",
+    "tape": "^4.10.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "server": "nodemon src/entry.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iliser/loader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iliser/loader/issues"
+  },
+  "homepage": "https://github.com/iliser/loader#readme"
+}
