@@ -5,7 +5,7 @@ const comment = require("./models/comments");
 const producer = require("./models/producer");
 const offer = require("./models/offer");
 
-let clearRequest = fields => async (ctx, next) => {
+const clearRequest = fields => async (ctx, next) => {
     let select = (ctx.state.select = {});
     fields.forEach(key => {
         select[key] = 0;
@@ -104,8 +104,8 @@ module.exports = router => {
         ]
     });
     registerCRUD(router, "/api/comment", comment, {
-        del: [() => {}],
-        patch: [() => {}]
+        del: [() => {}],//stop executing
+        patch: [() => {}] 
     });
     registerCRUD(router, "/api/producer", producer, {
         all: [clearRequest(["smsCode"])],

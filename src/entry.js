@@ -4,8 +4,7 @@ const Router = require("koa-router");
 const KoaBody = require("koa-body");
 const Mongoose = require("mongoose");
 const intel = require("intel");
-const routerInit = require("./routes.js")
-
+const routerInit = require("./emodels/buildModels");
 
 const router = Router();
 const app = new Koa();
@@ -24,16 +23,16 @@ async function ConnectToMongo() {
 
 ConnectToMongo();
 
+const login = require("./controller/login");
+
+router
+    .post("/api/ ", login.enterPhoneNumber)
+    .post("/api/enterSmsCode", login.enterCode);
 
 routerInit(router);
 
 app.use(KoaBody({ multipart: true }));
-app.use((ctx,next) =>{
-    ctx.state.producerId = "5d199ba51802dc3418b54683";
-    ctx.state.producerConfirmed = true;
-    // ctx.state.isAdmin = true;
-    return next();
-});
+app.use(login.authenticate);
 app.use(router.routes());
 
 server.listen(3002, () => console.log("server listen 3002"));
