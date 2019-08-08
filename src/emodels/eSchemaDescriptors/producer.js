@@ -23,7 +23,7 @@ module.exports = {
     isConfirmed: {
         type: Boolean,
         default: false,
-        access: user => user.isAdmin
+        access: u => [1,2][+u.isAdmin]
     },
 
     smsCode: { type: String, system: true }

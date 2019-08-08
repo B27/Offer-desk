@@ -7,5 +7,25 @@ module.exports = {
     },
     smsCodeIncorrectCode(phoneNumber){
         return `smsCode is incorrect`;
+    },
+
+    mustBeTheAdmin(){
+        return 'you must be the admin';
+    },
+
+    regionUsed(){
+        return 'region used now';
+    },
+    cateforyUsed(){
+        return 'category used now';
+    },
+    documentNotFound(){
+        return "document not found";
+    },
+    commentPatchError(){
+        return "comment can't be modified";
+    },
+    commentDeleteError(){
+        return "comment can't be deleted";
     }
 };

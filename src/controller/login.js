@@ -8,6 +8,21 @@ function generateSmsCode() {
     return ("00000" + Math.random() * 1000000).slice(-6);
 }
 
+async function adminSignIn(ctx){
+    const {login,password} = ctx.request.body;
+    if (login === "dev" && password === "012345") {
+        const token = jwt.sign(
+            { type: "admin", isAdmin: true },
+            constants.JWTSECRET
+        );
+        ctx.status = 200;
+        ctx.body = { token, isAdmin: true, type: "admin" };
+        return 0;
+    }
+    ctx.status = 403;
+    ctx.body = {errmsg:"access denied"}
+};
+
 async function enterPhoneNumber(ctx) {
     const { phoneNumber } = ctx.request.body;
     let doc = await producer.findOne({ phoneNumber });
@@ -35,7 +50,8 @@ const smsCodeTry = {};
 
 async function enterCode(ctx) {
     const { phoneNumber, smsCode } = ctx.request.body;
-    let doc = await producer.findOne({ phoneNumber });
+    let doc = await producer.findOne({ phoneNumber });    
+
     ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
     if (doc.smsCode !== smsCode) {
         //First access init counter to 0, next increment
@@ -66,12 +82,21 @@ async function enterCode(ctx) {
     }
 }
 
+function refreshToken(ctx) {
+    const {user} = ctx.state;
+    if(user){
+        ctx.status = 200;
+        ctx.body = {token:jwt.sign(user,constants.JWTSECRET),...user};
+    }
+}
+
 function authenticate(ctx, next) {
     try {
+        ctx.state.user = { isAdmin: false };
         const auth = ctx.header.authorization;
         if (typeof auth === typeof "" && auth.slice(0, 7) === "Bearer ") {
             const user = jwt.verify(auth.slice(7), constants.JWTSECRET);
-            ctx.state.user = user;
+            ctx.state.user = { ...ctx.state.user, ...user };
         }
     } catch (err) {
         ctx.throw(400, "Invalid authenticate token");
@@ -81,6 +106,8 @@ function authenticate(ctx, next) {
 }
 
 module.exports = {
+    adminSignIn,
+    refreshToken,
     enterPhoneNumber,
     enterCode,
     authenticate

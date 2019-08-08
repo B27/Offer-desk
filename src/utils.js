@@ -1,3 +1,4 @@
+const _ = require('lodash');
 module.exports = {
     //build query from koa ctx
     dbConnector:(dbMethod,model) => async ctx =>
@@ -5,6 +6,13 @@ module.exports = {
         let request = {...ctx.request.body,...ctx.query};
         const user = ctx.state.user;
         console.log(request);
+        const options = {};
+        for(let key in request)
+            if(key.slice(0,2) === '__'){
+                options[key] = request[key];
+                _.unset(request,key);
+            }
+        ctx.requestOptions = options;
         request = model.clearRequest(request,user);
         console.log(request);
         try{

@@ -2,17 +2,13 @@ const Mongoose = require("mongoose");
 const ObjectId = Mongoose.Schema.Types.ObjectId;
 const _ = require("lodash");
 
-function eBuilder(
-    eSchemaDescriptor,
-    defaultAccess,
-    [getDeleteError, getPostError] = [_ => false, _ => false]
-) {
+function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
     function scan(schema, oldKey = undefined) {
         if (oldKey) oldKey += ".";
         else oldKey = "";
         const ret = {
             access: [],
-            system: [],
+            system: ["__v"],
             file: [],
             access: [],
             ref: [],
@@ -82,8 +78,9 @@ function eBuilder(
         }
     });
     schema.statics.clearRequest = clearReq;
-    schema.methods.getDeleteError = getDeleteError;
-    schema.methods.getPostError = getPostError;
+    schema.methods.getDeleteError = getErrors.getDeleteError || (_ => false);
+    schema.methods.getPostError = getErrors.getPostError || (_ => false);
+    schema.methods.getUpdateError = getErrors.getUpdateError || (_ => false);
 
     schema.post("save", async function() {
         await sr.autopopulate
