@@ -16,7 +16,7 @@ module.exports = {
     regionUsed(){
         return 'region used now';
     },
-    cateforyUsed(){
+    categoryUsed(){
         return 'category used now';
     },
     documentNotFound(){
