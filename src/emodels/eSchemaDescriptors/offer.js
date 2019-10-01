@@ -29,7 +29,8 @@ module.exports = {
         ...phoneNumberSchemaDescriptor,
         required: true
     },
-    rating: { type: Number, default: 0, system: true }
+    rating: { type: Number, default: 0, access: () => 1 },
+    rateCount: { type: Number, default: 0, access: () => 1 }
 };
 
 // OfferSchema.virtual("comments", {

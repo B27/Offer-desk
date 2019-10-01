@@ -3,7 +3,6 @@ const Koa = require("koa");
 const Router = require("koa-router");
 const KoaBody = require("koa-body");
 const Mongoose = require("mongoose");
-const intel = require("intel");
 const routerInit = require("./emodels/buildModels");
 const cors = require("@koa/cors");
 
@@ -16,9 +15,9 @@ async function ConnectToMongo() {
         await Mongoose.connect("mongodb://localhost:27017/offer_desk", {
             useNewUrlParser: true
         });
-        intel.info("succefuly connected to mongo db");
+        console.info("succefuly connected to mongo db");
     } catch (err) {
-        intel.error(`error connect to mongo db : `, err);
+        console.error(`error connect to mongo db : `, err);
     }
 }
 
@@ -31,6 +30,9 @@ router
     .post("/api/enterPhoneNumber", login.enterPhoneNumber)
     .post("/api/enterSmsCode", login.enterCode)
     .post("/api/adminSignIn",login.adminSignIn);
+
+const rating = require("./controller/rating");
+router.post("/api/cahngerating",rating.changeRating);
 
 routerInit(router);
 
