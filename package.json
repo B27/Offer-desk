@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/iliser/loader/issues"
   },
-  "homepage": "https://github.com/iliser/loader#readme"
+  "homepage": "https://github.com/iliser/loader#readme",
+  "devDependencies": {
+    "eslint": "^6.5.1"
+  }
 }
