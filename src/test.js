@@ -10,7 +10,7 @@ async function ConnectToMongo() {
     }
 }
 
-// ConnectToMongo();
+ConnectToMongo();
 
 const Identification = require("./models/identification");
 
@@ -45,5 +45,5 @@ test("validation", async t => {
             "[190,22] is not a valid geo pair, coordinates must be in range lng [-180,180], lat [-90,90]"
         ]
     );
-    console.log(validateTest(new Identification({email:"email@mail.com",name:"asd1"})));
+    console.log(validateTest(new Identification({ email: "email@mail.com", name: "asd1" })));
 });

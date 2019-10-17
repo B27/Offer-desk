@@ -8,7 +8,7 @@ module.exports = {
             return phoneUtil.isValidNumber(number);
         },
         message: props => `${props.value} is not a valid phone number`
-    },
+    }
     // unique: true,
     // sparce: true
 };

@@ -5,6 +5,8 @@ const KoaBody = require("koa-body");
 const Mongoose = require("mongoose");
 const routerInit = require("./emodels/buildModels");
 const cors = require("@koa/cors");
+const login = require("./controller/login");
+const rating = require("./controller/rating");
 
 const router = Router();
 const app = new Koa();
@@ -24,21 +26,18 @@ async function ConnectToMongo() {
 
 ConnectToMongo();
 
-const login = require("./controller/login");
-
 router
-    .get("/api/refreshToken",login.refreshToken)
+    .get("/api/refreshToken", login.refreshToken)
     .post("/api/enterPhoneNumber", login.enterPhoneNumber)
     .post("/api/enterSmsCode", login.enterCode)
-    .post("/api/adminSignIn",login.adminSignIn);
+    .post("/api/adminSignIn", login.adminSignIn);
 
-const rating = require("./controller/rating");
-router.post("/api/cahngerating",rating.changeRating);
+router.post("/api/cahngerating", rating.changeRating);
 
 routerInit(router);
 
 app.use(KoaBody({ multipart: true }));
-app.use(cors({credentials: true}));
+app.use(cors({ credentials: true }));
 app.use(login.authenticate);
 app.use(router.routes());
 

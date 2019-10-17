@@ -39,5 +39,4 @@ module.exports = {
 //     foreignField: "offer"
 // });
 
-
 // module.exports = Mongoose.model("Offer", OfferSchema);

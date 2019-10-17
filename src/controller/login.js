@@ -8,20 +8,17 @@ function generateSmsCode() {
     return ("00000" + Math.random() * 1000000).slice(-6);
 }
 
-async function adminSignIn(ctx){
-    const {login,password} = ctx.request.body;
+async function adminSignIn(ctx) {
+    const { login, password } = ctx.request.body;
     if (login === "dev" && password === "012345") {
-        const token = jwt.sign(
-            { type: "admin", isAdmin: true },
-            constants.JWTSECRET
-        );
+        const token = jwt.sign({ type: "admin", isAdmin: true }, constants.JWTSECRET);
         ctx.status = 200;
         ctx.body = { token, isAdmin: true, type: "admin" };
         return 0;
     }
     ctx.status = 403;
-    ctx.body = {errmsg:"access denied"}
-};
+    ctx.body = { errmsg: "access denied" };
+}
 
 async function enterPhoneNumber(ctx) {
     const { phoneNumber } = ctx.request.body;
@@ -37,8 +34,7 @@ async function enterPhoneNumber(ctx) {
 
     //Delete code after timeout
     setTimeout(
-        () =>
-            producer.findOneAndUpdate({ phoneNumber }, { smsCode: undefined }),
+        () => producer.findOneAndUpdate({ phoneNumber }, { smsCode: undefined }),
         constants.SMS_CODE_TIME_LIMIT
     );
 
@@ -50,7 +46,7 @@ const smsCodeTry = {};
 
 async function enterCode(ctx) {
     const { phoneNumber, smsCode } = ctx.request.body;
-    let doc = await producer.findOne({ phoneNumber });    
+    let doc = await producer.findOne({ phoneNumber });
 
     ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
     if (doc.smsCode !== smsCode) {
@@ -60,20 +56,14 @@ async function enterCode(ctx) {
             // don't use await, because we don't want to wait save and can return result right now
             doc.set({ smsCode: undefined }).save();
             delete smsCodeTry[phoneNumber];
-            ctx.throw(
-                403,
-                errorMessages.smsCodeExceededNumberOfTry(phoneNumber)
-            );
+            ctx.throw(403, errorMessages.smsCodeExceededNumberOfTry(phoneNumber));
         }
         ctx.throw(403, errorMessages.smsCodeIncorrectCode(phoneNumber));
     } else {
         delete smsCodeTry[phoneNumber];
 
         const { _id, isConfirmed } = doc;
-        const token = jwt.sign(
-            { _id, type: "producer", isConfirmed },
-            constants.JWTSECRET
-        );
+        const token = jwt.sign({ _id, type: "producer", isConfirmed }, constants.JWTSECRET);
         // don't use await, because we don't want to wait save and can return result right now
         doc.set({ smsCode: undefined }).save();
 
@@ -83,10 +73,10 @@ async function enterCode(ctx) {
 }
 
 function refreshToken(ctx) {
-    const {user} = ctx.state;
-    if(user){
+    const { user } = ctx.state;
+    if (user) {
         ctx.status = 200;
-        ctx.body = {token:jwt.sign(user,constants.JWTSECRET),...user};
+        ctx.body = { token: jwt.sign(user, constants.JWTSECRET), ...user };
     }
 }
 

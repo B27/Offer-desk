@@ -10,7 +10,6 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
             access: [],
             system: ["__v"],
             file: [],
-            access: [],
             ref: [],
             autopopulate: []
         };
@@ -30,10 +29,8 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
                     });
                 if (val.type === ObjectId && val.ref)
                     ret.ref.push({ key: oldKey + key, ref: val.ref });
-                if (val.access)
-                    ret.access.push({ key: oldKey + key, f: val.access });
-                else if (defaultAccess)
-                    ret.access.push({ key: oldKey + key, f: defaultAccess });
+                if (val.access) ret.access.push({ key: oldKey + key, f: val.access });
+                else if (defaultAccess) ret.access.push({ key: oldKey + key, f: defaultAccess });
                 if (val.autopopulate) ret.autopopulate.push(oldKey + key);
             } else {
                 merge(ret, scan(val, key));
@@ -78,21 +75,17 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
         }
     });
     schema.statics.clearRequest = clearReq;
-    schema.methods.getDeleteError = getErrors.getDeleteError || (_ => false);
-    schema.methods.getPostError = getErrors.getPostError || (_ => false);
-    schema.methods.getUpdateError = getErrors.getUpdateError || (_ => false);
+    schema.methods.getDeleteError = getErrors.getDeleteError || (() => false);
+    schema.methods.getPostError = getErrors.getPostError || (() => false);
+    schema.methods.getUpdateError = getErrors.getUpdateError || (() => false);
 
     schema.post("save", async function() {
-        await sr.autopopulate
-            .reduce((acc, path) => acc.populate(path), this)
-            .execPopulate();
+        await sr.autopopulate.reduce((acc, path) => acc.populate(path), this).execPopulate();
     });
 
     schema.post("find", async function(docs) {
         for (let doc of docs) {
-            await sr.autopopulate
-                .reduce((acc, path) => acc.populate(path), doc)
-                .execPopulate();
+            await sr.autopopulate.reduce((acc, path) => acc.populate(path), doc).execPopulate();
         }
     });
     return schema;
