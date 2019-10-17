@@ -13,7 +13,8 @@ const server = Http.createServer(app.callback());
 async function ConnectToMongo() {
     try {
         await Mongoose.connect("mongodb://localhost:27017/offer_desk", {
-            useNewUrlParser: true
+            useNewUrlParser: true,
+            useUnifiedTopology: true
         });
         console.info("succefuly connected to mongo db");
     } catch (err) {
