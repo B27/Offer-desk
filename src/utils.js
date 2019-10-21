@@ -6,11 +6,12 @@ module.exports = {
         const user = ctx.state.user;
         console.log(request);
         const options = {};
-        for (let key in request)
+        for (let key in request) {
             if (key.slice(0, 2) === "__") {
                 options[key] = request[key];
                 _.unset(request, key);
             }
+        }
         ctx.requestOptions = options;
         request = model.clearRequest(request, user);
         console.log(request);
@@ -18,8 +19,11 @@ module.exports = {
             const res = await dbMethod(request, ctx);
             ctx.status = 200;
 
-            if (Array.isArray(res)) ctx.body = res.map(v => v.toJSON({ user }));
-            else ctx.body = res.toJSON({ user });
+            if (Array.isArray(res)) {
+                ctx.body = res.map(v => v.toJSON({ user }));
+            } else {
+                ctx.body = res.toJSON({ user });
+            }
         } catch (err) {
             // console.log({err});
             ctx.status = err.status || 500;

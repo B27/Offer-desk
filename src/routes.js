@@ -17,7 +17,9 @@ const clearRequest = fields => async (ctx, next) => {
 };
 
 const mustBeAdmin = (ctx, next) => {
-    if (ctx.state.isAdmin) return next();
+    if (ctx.state.isAdmin) {
+        return next();
+    }
     ctx.status = 403;
     ctx.body = {};
 };
@@ -100,7 +102,9 @@ module.exports = router => {
         del: [mustBeAdmin],
         patch: [
             (ctx, next) => {
-                if (ctx.state.isAdmin) return next();
+                if (ctx.state.isAdmin) {
+                    return next();
+                }
                 let pid = ctx.state.producerId;
                 let epid = ctx.query._id || ctx.request.body._id;
                 ctx.assert(pid === epid, 403, "you can't modify another producer info");

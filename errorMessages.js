@@ -5,27 +5,27 @@ module.exports = {
     smsCodeExceededNumberOfTry(phoneNumber) {
         return `number of attempts to enter sms code to user ${phoneNumber} overlimited`;
     },
-    smsCodeIncorrectCode(phoneNumber){
+    smsCodeIncorrectCode(phoneNumber) {
         return `smsCode is incorrect`;
     },
 
-    mustBeTheAdmin(){
-        return 'you must be the admin';
+    mustBeTheAdmin() {
+        return "you must be the admin";
     },
 
-    regionUsed(){
-        return 'region used now';
+    regionUsed() {
+        return "region used now";
     },
-    categoryUsed(){
-        return 'category used now';
+    categoryUsed() {
+        return "category used now";
     },
-    documentNotFound(){
+    documentNotFound() {
         return "document not found";
     },
-    commentPatchError(){
+    commentPatchError() {
         return "comment can't be modified";
     },
-    commentDeleteError(){
+    commentDeleteError() {
         return "comment can't be deleted";
     }
 };

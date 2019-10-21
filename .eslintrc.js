@@ -15,6 +15,7 @@ module.exports = {
     },
     rules: {
         "prettier/prettier": "warn",
-        "require-atomic-updates": "off"
+        "require-atomic-updates": "off",
+        "curly": "warn"
     }
 };

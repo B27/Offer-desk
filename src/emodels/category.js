@@ -9,8 +9,12 @@ module.exports = em.eModel(
     em.eSchema(category, u => [READ, WRITE][+u.isAdmin], {
         getPostError: u => [err.mustBeTheAdmin(), null][+u.isAdmin],
         getDeleteError: async (u, id) => {
-            if (!u.isAdmin) return err.mustBeTheAdmin();
-            if (await Offer.findOne({ category: id })) return err.categoryUsed();
+            if (!u.isAdmin) {
+                return err.mustBeTheAdmin();
+            }
+            if (await Offer.findOne({ category: id })) {
+                return err.categoryUsed();
+            }
             return null;
         }
     })

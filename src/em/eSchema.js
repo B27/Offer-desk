@@ -4,8 +4,11 @@ const _ = require("lodash");
 
 function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
     function scan(schema, oldKey = undefined) {
-        if (oldKey) oldKey += ".";
-        else oldKey = "";
+        if (oldKey) {
+            oldKey += ".";
+        } else {
+            oldKey = "";
+        }
         const ret = {
             access: [],
             system: ["__v"],
@@ -15,23 +18,34 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
         };
 
         function merge(obj1, obj2) {
-            for (const key in obj1) obj1[key] = obj1[key].concat(obj2[key]);
+            for (const key in obj1) {
+                obj1[key] = obj1[key].concat(obj2[key]);
+            }
         }
 
         for (let key in schema) {
             const val = schema[key];
             if (val.type) {
-                if (val.system) ret.system.push(oldKey + key);
-                if (val.file)
+                if (val.system) {
+                    ret.system.push(oldKey + key);
+                }
+                if (val.file) {
                     ret.file.push({
                         key: oldKey + key,
                         ...val.file
                     });
-                if (val.type === ObjectId && val.ref)
+                }
+                if (val.type === ObjectId && val.ref) {
                     ret.ref.push({ key: oldKey + key, ref: val.ref });
-                if (val.access) ret.access.push({ key: oldKey + key, f: val.access });
-                else if (defaultAccess) ret.access.push({ key: oldKey + key, f: defaultAccess });
-                if (val.autopopulate) ret.autopopulate.push(oldKey + key);
+                }
+                if (val.access) {
+                    ret.access.push({ key: oldKey + key, f: val.access });
+                } else if (defaultAccess) {
+                    ret.access.push({ key: oldKey + key, f: defaultAccess });
+                }
+                if (val.autopopulate) {
+                    ret.autopopulate.push(oldKey + key);
+                }
             } else {
                 merge(ret, scan(val, key));
             }
@@ -45,7 +59,9 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
     function buildClearRequest(access, system) {
         return (query, user) => {
             access.forEach(({ key, f }) => {
-                if (f(user) !== 2) _.unset(query, key);
+                if (f(user) !== 2) {
+                    _.unset(query, key);
+                }
             });
             system.forEach(key => _.unset(query, key));
             return query;
@@ -54,7 +70,9 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
     function buildClearAnswer(access, system) {
         return (doc, user) => {
             access.forEach(({ key, f }) => {
-                if (f(user) === 0) _.unset(doc, key);
+                if (f(user) === 0) {
+                    _.unset(doc, key);
+                }
             });
             system.forEach(key => _.unset(doc, key));
             return doc;

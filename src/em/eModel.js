@@ -25,7 +25,9 @@ function registerCRUD(path, router, model) {
                 console.log(err);
 
                 const vr = doc.validateSync();
-                if (vr) throw vr;
+                if (vr) {
+                    throw vr;
+                }
 
                 return doc.save();
             }, model)
@@ -41,7 +43,9 @@ function registerCRUD(path, router, model) {
                 ctx.assert(!err, 400, err);
 
                 const vr = doc.validateSync();
-                if (vr) throw vr;
+                if (vr) {
+                    throw vr;
+                }
 
                 return doc.save();
             }, model)
