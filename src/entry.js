@@ -7,6 +7,7 @@ const routerInit = require("./emodels/buildModels");
 const cors = require("@koa/cors");
 const login = require("./controller/login");
 const rating = require("./controller/rating");
+const ad = require("./controller/ad");
 
 const router = Router();
 const app = new Koa();
@@ -16,7 +17,8 @@ async function ConnectToMongo() {
     try {
         await Mongoose.connect("mongodb://localhost:27017/offer_desk", {
             useNewUrlParser: true,
-            useUnifiedTopology: true
+            useUnifiedTopology: true,
+            useCreateIndex: true
         });
         console.info("succefuly connected to mongo db");
     } catch (err) {
@@ -33,6 +35,9 @@ router
     .post("/api/adminSignIn", login.adminSignIn);
 
 router.post("/api/cahngerating", rating.changeRating);
+
+router.get("/api/ad/preview", )
+router.get("/api/ad/photo", ad.getPhoto);
 
 routerInit(router);
 

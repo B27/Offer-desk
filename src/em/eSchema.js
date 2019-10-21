@@ -29,6 +29,7 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
                 if (val.system) {
                     ret.system.push(oldKey + key);
                 }
+
                 if (val.file) {
                     ret.file.push({
                         key: oldKey + key,
@@ -54,7 +55,7 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
     }
 
     const sr = scan(eSchemaDescriptor);
-    console.log(sr);
+    console.log("scanned eSchemaDescriptor", sr);
 
     function buildClearRequest(access, system) {
         return (query, user) => {

@@ -12,7 +12,7 @@ module.exports = {
         autopopulate: true
     },
     photos: { type: [String], file: { path: "photos", array: true } },
-    price: { type: Number, required: true },
+    price: { type: Number },
     producer: {
         type: ObjectId,
         required: true,
@@ -30,8 +30,13 @@ module.exports = {
         required: true
     },
     rating: { type: Number, default: 0, access: () => 1 },
-    rateCount: { type: Number, default: 0, access: () => 1 }
+    rateCount: { type: Number, default: 0, access: () => 1 },
+    createdAt: { type: Date, index: true }
 };
+
+// new Mongoose.Schema({
+//     publicationDate: { type: Number, index: true, default: Date.now }
+// });
 
 // OfferSchema.virtual("comments", {
 //     ref: "Comment",
