@@ -5,10 +5,11 @@ const KoaBody = require("koa-body");
 const Mongoose = require("mongoose");
 const routerInit = require("./emodels/buildModels");
 const cors = require("@koa/cors");
-const login = require("./controller/login");
-const rating = require("./controller/rating");
-const ad = require("./controller/ad");
-const category = require("./controller/category");
+const loginController = require("./controller/login");
+const ratingController = require("./controller/rating");
+const adController = require("./controller/ad");
+const categoryController = require("./controller/category");
+const imageController = require("./controller/image");
 const fs = require("fs");
 const { UPLOADDIR } = require("../constants");
 
@@ -36,12 +37,12 @@ async function ConnectToMongo() {
 ConnectToMongo();
 
 router
-    .get("/api/refreshToken", login.refreshToken)
-    .post("/api/enterPhoneNumber", login.enterPhoneNumber)
-    .post("/api/enterSmsCode", login.enterCode)
-    .post("/api/adminSignIn", login.adminSignIn);
+    .get("/api/refreshToken", loginController.refreshToken)
+    .post("/api/enterPhoneNumber", loginController.enterPhoneNumber)
+    .post("/api/enterSmsCode", loginController.enterCode)
+    .post("/api/adminSignIn", loginController.adminSignIn);
 
-router.post("/api/cahngerating", rating.changeRating);
+router.post("/api/changeRating", ratingController.changeRating);
 
 router
     // .get("/api/ad", ctx => {
@@ -58,16 +59,22 @@ router
     //             </body>
     //             </html>`;
     // })
-    .post("/api/ad", ad.postAd)
-    .get("/api/ad/preview", ad.getPreview)
-    .get("/api/ad/photo", ad.getPhoto)
-    .post("/api/category", category.addCategory);
+    .post("/api/ad", adController.postAd)
+    .get("/api/ad/preview", adController.getPreview)
+    .get("/api/ad/photo", adController.getPhoto)
+    .get("/api/images/:image", imageController.getImage)
+    .post("/api/category", categoryController.addCategory);
 
 routerInit(router);
 
-app.use(KoaBody({ multipart: true, formidable: { multiples: true, uploadDir: UPLOADDIR } }));
 app.use(cors({ credentials: true }));
-app.use(login.authenticate);
+app.use(
+    KoaBody({
+        multipart: true,
+        formidable: { multiples: true, uploadDir: UPLOADDIR }
+    })
+);
+app.use(loginController.authenticate);
 app.use(router.routes());
 
 server.listen(3002, () => console.log("server listen 3002"));
