@@ -2,7 +2,7 @@ const errorMessages = require("../../errorMessages");
 const constants = require("../../constants");
 
 const jwt = require("jsonwebtoken");
-const [producer] = require("../emodels/producer");
+const [manufacturer] = require("../emodels/manufacturer");
 
 function generateSmsCode() {
     return ("00000" + Math.random() * 1000000).slice(-6);
@@ -22,7 +22,7 @@ async function adminSignIn(ctx) {
 
 async function enterPhoneNumber(ctx) {
     const { phoneNumber } = ctx.request.body;
-    let doc = await producer.findOne({ phoneNumber });
+    let doc = await manufacturer.findOne({ phoneNumber });
     ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
     await doc
         .set({
@@ -34,7 +34,7 @@ async function enterPhoneNumber(ctx) {
 
     //Delete code after timeout
     setTimeout(
-        () => producer.findOneAndUpdate({ phoneNumber }, { smsCode: undefined }),
+        () => manufacturer.findOneAndUpdate({ phoneNumber }, { smsCode: undefined }),
         constants.SMS_CODE_TIME_LIMIT
     );
 
@@ -46,7 +46,7 @@ const smsCodeTry = {};
 
 async function enterCode(ctx) {
     const { phoneNumber, smsCode } = ctx.request.body;
-    let doc = await producer.findOne({ phoneNumber });
+    let doc = await manufacturer.findOne({ phoneNumber });
 
     ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
     if (doc.smsCode !== smsCode) {
@@ -63,7 +63,7 @@ async function enterCode(ctx) {
         delete smsCodeTry[phoneNumber];
 
         const { _id, isConfirmed } = doc;
-        const token = jwt.sign({ _id, type: "producer", isConfirmed }, constants.JWTSECRET);
+        const token = jwt.sign({ _id, type: "manufacturer", isConfirmed }, constants.JWTSECRET);
         // don't use await, because we don't want to wait save and can return result right now
         doc.set({ smsCode: undefined }).save();
 

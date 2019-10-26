@@ -3,8 +3,8 @@ const err = require("../../errorMessages");
 const em = require("../em");
 const region = require("./eSchemaDescriptors/region");
 
-const Offer = require("./offer")[0];
-const Producer = require("./producer")[0];
+const Ad = require("./ad")[0];
+const Manufacturer = require("./manufacturer")[0];
 
 module.exports = em.eModel(
     "Region",
@@ -14,8 +14,8 @@ module.exports = em.eModel(
             if (!u.isAdmin) {
                 return err.mustBeTheAdmin();
             }
-            // console.log(Offer.findOne({region:id}),Producer.findOne({region:id}))
-            if ((await Offer.findOne({ region: id })) || (await Producer.findOne({ region: id }))) {
+            // console.log(Ad.findOne({region:id}),Manufacturer.findOne({region:id}))
+            if ((await Ad.findOne({ region: id })) || (await Manufacturer.findOne({ region: id }))) {
                 return err.regionUsed();
             }
             return null;

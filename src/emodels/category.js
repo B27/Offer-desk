@@ -2,7 +2,7 @@ const em = require("../em");
 const category = require("./eSchemaDescriptors/category");
 const { READ, WRITE } = require("../access");
 const err = require("../../errorMessages");
-const Offer = require("./offer")[0];
+const Ad = require("./ad")[0];
 
 module.exports = em.eModel(
     "Category",
@@ -12,7 +12,7 @@ module.exports = em.eModel(
             if (!u.isAdmin) {
                 return err.mustBeTheAdmin();
             }
-            if (await Offer.findOne({ category: id })) {
+            if (await Ad.findOne({ category: id })) {
                 return err.categoryUsed();
             }
             return null;

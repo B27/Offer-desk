@@ -23,7 +23,7 @@ const server = Http.createServer(app.callback());
 
 async function ConnectToMongo() {
     try {
-        await Mongoose.connect("mongodb://localhost:27017/offer_desk", {
+        await Mongoose.connect("mongodb://localhost:27017/ad_desk", {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useCreateIndex: true

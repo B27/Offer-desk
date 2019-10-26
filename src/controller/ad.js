@@ -1,7 +1,7 @@
 const errorMessages = require("../../errorMessages");
 const constants = require("../../constants");
 
-const [offer] = require("../emodels/offer");
+const [ad] = require("../emodels/ad");
 
 async function getPhoto() {}
 
