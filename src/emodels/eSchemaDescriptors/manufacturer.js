@@ -6,7 +6,8 @@ module.exports = {
     phoneNumber: {
         ...phoneNumberSchemaDescriptor,
         required: true,
-        index: true
+        index: true,
+        unique: true
     },
     feedbackPhoneNumber: {
         ...phoneNumberSchemaDescriptor,
