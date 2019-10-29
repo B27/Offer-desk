@@ -11,7 +11,7 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
         }
         const ret = {
             access: [],
-            system: ["__v"],
+            system: ["__v", "_id"],
             file: [],
             ref: [],
             autopopulate: []

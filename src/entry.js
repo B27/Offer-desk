@@ -10,6 +10,7 @@ const ratingController = require("./controller/rating");
 const adController = require("./controller/ad");
 const categoryController = require("./controller/category");
 const imageController = require("./controller/image");
+const manufacturerController = require("./controller/manufacturer");
 const fs = require("fs");
 const { UPLOADDIR } = require("../constants");
 
@@ -45,25 +46,12 @@ router
 router.post("/api/changeRating", ratingController.changeRating);
 
 router
-    // .get("/api/ad", ctx => {
-    //     ctx.set("Content-Type", "text/html");
-    //     ctx.body = `
-    //             <!doctype html>
-    //             <html>
-    //             <body>
-    //                 <form action="/api/ad" enctype="multipart/form-data" method="post">
-    //                 <input type="text" name="username" placeholder="username"><br>
-    //                 <input type="text" name="title" placeholder="tile of film"><br>
-    //                 <input type="file" name="uploads" multiple="multiple"><br>
-    //                 <button type="submit">Upload</button>
-    //             </body>
-    //             </html>`;
-    // })
     .post("/api/ad", adController.postAd)
     .get("/api/ad/preview", adController.getPreview)
     .get("/api/ad/photo", adController.getPhoto)
     .get("/api/images/:image", imageController.getImage)
-    .post("/api/category", categoryController.addCategory);
+    .post("/api/category", categoryController.addCategory)
+    .post("/api/manufacturer", manufacturerController.saveManufacturerSendSms);
 
 routerInit(router);
 

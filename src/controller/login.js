@@ -26,17 +26,17 @@ async function enterPhoneNumber(ctx) {
     ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
     await doc
         .set({
-            smsCode: process.env.development
+            smsConfirmation: process.env.development
                 ? constants.SMS_CODE_DEFAULT_DEV_CODE
                 : generateSmsCode()
         })
         .save();
 
-    //Delete code after timeout
-    setTimeout(
-        () => manufacturer.findOneAndUpdate({ phoneNumber }, { smsCode: undefined }),
-        constants.SMS_CODE_TIME_LIMIT
-    );
+    // //Delete code after timeout
+    // setTimeout(
+    //     () => manufacturer.findOneAndUpdate({ phoneNumber }, { smsConfirmation: undefined }),
+    //     constants.SMS_CODE_TIME_LIMIT
+    // );
 
     ctx.status = 200;
     ctx.body = "OK";

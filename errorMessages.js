@@ -1,11 +1,20 @@
 module.exports = {
+    userAlreadyRegistered() {
+        return "user already registered and confirmed";
+    },
+
+    userNeedConfirmation() {
+        return "user needs confirmation from administrator"
+    },
+
     userNotFound(phoneNumber) {
         return `user with phone number ${phoneNumber} not found`;
     },
     smsCodeExceededNumberOfTry(phoneNumber) {
         return `number of attempts to enter sms code to user ${phoneNumber} overlimited`;
     },
-    smsCodeIncorrectCode(phoneNumber) {
+
+    smsCodeIncorrectCode() {
         return `smsCode is incorrect`;
     },
 

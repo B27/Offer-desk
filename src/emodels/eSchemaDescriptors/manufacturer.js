@@ -5,7 +5,8 @@ const ObjectId = Mongoose.Schema.Types.ObjectId;
 module.exports = {
     phoneNumber: {
         ...phoneNumberSchemaDescriptor,
-        required: true
+        required: true,
+        index: true
     },
     feedbackPhoneNumber: {
         ...phoneNumberSchemaDescriptor,
@@ -26,7 +27,15 @@ module.exports = {
         access: u => [1, 2][+u.isAdmin]
     },
 
-    smsCode: { type: String, system: true }
+    isSmsConfirmed: {
+        type: Boolean,
+        default: false
+    },
+
+    smsConfirmation: {
+        code: { type: String, system: true },
+        expirationDate: { type: Date, system: true }
+    }
 };
 
 // module.exports = Mongoose.model("Manufacturer", ManufacturerSchema);
