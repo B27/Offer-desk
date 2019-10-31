@@ -14,7 +14,7 @@ module.exports = {
         return `number of attempts to enter sms code to user ${phoneNumber} overlimited`;
     },
 
-    smsCodeIncorrect() {
+    smsCodeNotMatch() {
         return `sms code is incorrect`;
     },
 
@@ -26,8 +26,8 @@ module.exports = {
         return `sms code is expired`;
     },
 
-    smsCodeNotSended() {
-        return `sms code not sended`;
+    smsCodeNotSent() {
+        return `sms code is not sent`;
     },
 
     mustBeTheAdmin() {

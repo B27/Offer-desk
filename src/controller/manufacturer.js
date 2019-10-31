@@ -29,7 +29,7 @@ async function saveManufacturerSendSms(ctx) {
             ctx.throw(403, errorMessages.userNeedConfirmation());
         }
 
-        // send sms code methods
+        await sendSmsToManufacturer(oldManDoc);
 
         for (const manField of Object.keys(manufacturerData)) {
             oldManDoc[manField] = manufacturerData[manField];
@@ -38,8 +38,8 @@ async function saveManufacturerSendSms(ctx) {
         await oldManDoc.save({ validateBeforeSave: false });
         ctx.body = "manufacturer updated";
     } else {
-        // send sms code methods
         await sendSmsToManufacturer(newManDoc);
+
         await newManDoc.save({ validateBeforeSave: false });
         ctx.body = "manufacturer saved";
     }
@@ -83,23 +83,28 @@ async function enterCode(ctx) {
 
     ctx.assert(phoneNumber && smsCode, 404, errorMessages.validationError());
     ctx.assert(manDoc, 404, errorMessages.userNotFound(phoneNumber));
-    ctx.assert(manDoc.smsConfirmation, 404, errorMessages.smsCodeNotSended());
+    ctx.assert(manDoc.smsConfirmation.code, 404, errorMessages.smsCodeNotSent());
 
     if (manDoc.smsConfirmation.code !== smsCode) {
-        ctx.body = { cause: "notMatch", message: errorMessages.smsCodeIncorrect() };
-        ctx.throw(403);
-    } else if (Date.now() > manDoc.smsConfirmation.expirationDate.getTime()) {
-        ctx.body = { cause: "expired", message: errorMessages.smsCodeExpired() };
-        ctx.throw(403);
-    } else {
-        const { _id } = manDoc;
-        const token = jwt.sign({ _id, type: "manufacturer" }, constants.JWTSECRET);
-        manDoc.isSmsConfirmed = true;
-        await manDoc.save();
-
-        ctx.status = 200;
-        ctx.body = { token, ...manDoc.toObject() };
+        ctx.body = { cause: "notMatch", message: errorMessages.smsCodeNotMatch() };
+        ctx.status = 403;
+        return;
     }
+
+    if (Date.now() > manDoc.smsConfirmation.expirationDate.getTime()) {
+        ctx.body = { cause: "expired", message: errorMessages.smsCodeExpired() };
+        ctx.status = 403;
+        return;
+    }
+
+    const { _id } = manDoc;
+    const token = jwt.sign({ _id, type: "manufacturer" }, constants.JWTSECRET);
+    manDoc.isSmsConfirmed = true;
+    await manDoc.save();
+
+    const { name } = manDoc;
+    ctx.status = 200;
+    ctx.body = { token, name };
 }
 
 function refreshToken(ctx) {

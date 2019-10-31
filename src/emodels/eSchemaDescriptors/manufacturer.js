@@ -18,8 +18,8 @@ module.exports = {
     region: {
         type: ObjectId,
         ref: "Region",
-        required: true,
-        autopopulate: true
+        required: true
+        // autopopulate: true
     },
 
     isConfirmed: {
