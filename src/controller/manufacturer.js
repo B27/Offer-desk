@@ -2,7 +2,7 @@ const errorMessages = require("../../errorMessages");
 const constants = require("../../constants");
 
 const jwt = require("jsonwebtoken");
-const [manufacturer] = require("../emodels/manufacturer");
+const [Manufacturer] = require("../emodels/manufacturer");
 
 function generateSmsCode() {
     return ("00000" + Math.random() * 1000000).slice(-6);
@@ -10,7 +10,7 @@ function generateSmsCode() {
 
 async function saveManufacturerSendSms(ctx) {
     const manufacturerData = ctx.request.body;
-    const newManDoc = new manufacturer(manufacturerData);
+    const newManDoc = new Manufacturer(manufacturerData);
 
     try {
         await newManDoc.validate();
@@ -18,7 +18,7 @@ async function saveManufacturerSendSms(ctx) {
         ctx.throw(400, error.message);
     }
 
-    let oldManDoc = await manufacturer.findOne({ phoneNumber: manufacturerData.phoneNumber });
+    let oldManDoc = await Manufacturer.findOne({ phoneNumber: manufacturerData.phoneNumber });
 
     if (oldManDoc) {
         if (oldManDoc.isConfirmed) {
@@ -35,20 +35,29 @@ async function saveManufacturerSendSms(ctx) {
             oldManDoc[manField] = manufacturerData[manField];
         }
 
-        oldManDoc.save({ validateBeforeSave: false });
+        await oldManDoc.save({ validateBeforeSave: false });
         ctx.body = "manufacturer updated";
     } else {
         // send sms code methods
-        newManDoc.save({ validateBeforeSave: false });
+        await sendSmsToManufacturer(newManDoc);
+        await newManDoc.save({ validateBeforeSave: false });
         ctx.body = "manufacturer saved";
     }
 
     ctx.status = 200;
 }
 
+async function sendSmsToManufacturer(manDoc) {
+    // methods for send sms to user
+    const code = generateSmsCode();
+    const expirationDate = Date.now() + constants.SMS_CODE_TIME_LIMIT;
+
+    manDoc.smsConfirmation = { code, expirationDate };
+}
+
 async function enterPhoneNumber(ctx) {
     const { phoneNumber } = ctx.request.body;
-    let doc = await manufacturer.findOne({ phoneNumber });
+    let doc = await Manufacturer.findOne({ phoneNumber });
     ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
     await doc
         .set({
@@ -68,33 +77,28 @@ async function enterPhoneNumber(ctx) {
     ctx.body = "OK";
 }
 
-const smsCodeTry = {};
-
 async function enterCode(ctx) {
     const { phoneNumber, smsCode } = ctx.request.body;
-    let doc = await manufacturer.findOne({ phoneNumber });
+    let manDoc = await Manufacturer.findOne({ phoneNumber });
 
-    ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
-    if (doc.smsCode !== smsCode) {
-        //First access init counter to 0, next increment
-        let i = (smsCodeTry[phoneNumber] = (smsCodeTry[phoneNumber] || 0) + 1);
-        if (i > constants.SMS_CODE_MAX_TRY_COUNT) {
-            // don't use await, because we don't want to wait save and can return result right now
-            doc.set({ smsCode: undefined }).save();
-            delete smsCodeTry[phoneNumber];
-            ctx.throw(403, errorMessages.smsCodeExceededNumberOfTry(phoneNumber));
-        }
-        ctx.throw(403, errorMessages.smsCodeIncorrectCode(phoneNumber));
+    ctx.assert(phoneNumber && smsCode, 404, errorMessages.validationError());
+    ctx.assert(manDoc, 404, errorMessages.userNotFound(phoneNumber));
+    ctx.assert(manDoc.smsConfirmation, 404, errorMessages.smsCodeNotSended());
+
+    if (manDoc.smsConfirmation.code !== smsCode) {
+        ctx.body = { cause: "notMatch", message: errorMessages.smsCodeIncorrect() };
+        ctx.throw(403);
+    } else if (Date.now() > manDoc.smsConfirmation.expirationDate.getTime()) {
+        ctx.body = { cause: "expired", message: errorMessages.smsCodeExpired() };
+        ctx.throw(403);
     } else {
-        delete smsCodeTry[phoneNumber];
-
-        const { _id, isConfirmed } = doc;
-        const token = jwt.sign({ _id, type: "manufacturer", isConfirmed }, constants.JWTSECRET);
-        // don't use await, because we don't want to wait save and can return result right now
-        doc.set({ smsCode: undefined }).save();
+        const { _id } = manDoc;
+        const token = jwt.sign({ _id, type: "manufacturer" }, constants.JWTSECRET);
+        manDoc.isSmsConfirmed = true;
+        await manDoc.save();
 
         ctx.status = 200;
-        ctx.body = { token, ...doc.toObject(), smsCode: undefined };
+        ctx.body = { token, ...manDoc.toObject() };
     }
 }
 

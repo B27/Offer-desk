@@ -6,7 +6,7 @@ module.exports = {
         const R = doc.rating,
             N = doc.rateCount;
         doc.rating = (R * N + ctx.params.rating) / (N + 1);
-        doc.save();
+        await doc.save();
         ctx.status = 200;
         ctx.body = doc;
     }

@@ -40,7 +40,7 @@ ConnectToMongo();
 router
     .get("/api/refreshToken", loginController.refreshToken)
     .post("/api/enterPhoneNumber", loginController.enterPhoneNumber)
-    .post("/api/enterSmsCode", loginController.enterCode)
+    .post("/api/enterSmsCode", manufacturerController.enterCode)
     .post("/api/adminSignIn", loginController.adminSignIn);
 
 router.post("/api/changeRating", ratingController.changeRating);

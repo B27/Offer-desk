@@ -4,7 +4,7 @@ module.exports = {
     },
 
     userNeedConfirmation() {
-        return "user needs confirmation from administrator"
+        return "user needs confirmation from administrator";
     },
 
     userNotFound(phoneNumber) {
@@ -14,8 +14,20 @@ module.exports = {
         return `number of attempts to enter sms code to user ${phoneNumber} overlimited`;
     },
 
-    smsCodeIncorrectCode() {
-        return `smsCode is incorrect`;
+    smsCodeIncorrect() {
+        return `sms code is incorrect`;
+    },
+
+    validationError() {
+        return `validation error`;
+    },
+
+    smsCodeExpired() {
+        return `sms code is expired`;
+    },
+
+    smsCodeNotSended() {
+        return `sms code not sended`;
     },
 
     mustBeTheAdmin() {

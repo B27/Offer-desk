@@ -10,7 +10,7 @@ module.exports = em.eModel(
                     return "You can't create ad as another manufacturer";
                 }
                 if (!user.isConfirmed) {
-                    return "Manufacturer can't be confirmed";
+                    return "Manufacturer not confirmed";
                 }
             }
             return null;

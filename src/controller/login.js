@@ -58,7 +58,7 @@ async function enterCode(ctx) {
             delete smsCodeTry[phoneNumber];
             ctx.throw(403, errorMessages.smsCodeExceededNumberOfTry(phoneNumber));
         }
-        ctx.throw(403, errorMessages.smsCodeIncorrectCode(phoneNumber));
+        ctx.throw(403, errorMessages.smsCodeIncorrect(phoneNumber));
     } else {
         delete smsCodeTry[phoneNumber];
 
