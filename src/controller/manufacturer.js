@@ -22,11 +22,15 @@ async function saveManufacturerSendSms(ctx) {
 
     if (oldManDoc) {
         if (oldManDoc.isConfirmed) {
-            ctx.throw(405, errorMessages.userAlreadyRegistered());
+            ctx.body = { cause: "adminConfirmed", message: errorMessages.userAlreadyRegistered() };
+            ctx.status = 403;
+            return;
         }
 
         if (oldManDoc.isSmsConfirmed) {
-            ctx.throw(403, errorMessages.userNeedConfirmation());
+            ctx.body = { cause: "smsConfirmed", message: errorMessages.userNeedConfirmation() };
+            ctx.status = 403;
+            return;
         }
 
         await sendSmsToManufacturer(oldManDoc);
