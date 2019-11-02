@@ -40,12 +40,12 @@ async function saveManufacturerSendSms(ctx) {
         }
 
         await oldManDoc.save({ validateBeforeSave: false });
-        ctx.body = "manufacturer updated";
+        ctx.body = { check: oldManDoc.smsConfirmation.check };
     } else {
         await sendSmsToManufacturer(newManDoc);
 
         await newManDoc.save({ validateBeforeSave: false });
-        ctx.body = "manufacturer saved";
+        ctx.body = { check: newManDoc.smsConfirmation.check };
     }
 
     ctx.status = 200;
@@ -55,8 +55,9 @@ async function sendSmsToManufacturer(manDoc) {
     // methods for send sms to user
     const code = generateSmsCode();
     const expirationDate = Date.now() + constants.SMS_CODE_TIME_LIMIT;
+    const check = Math.random();
 
-    manDoc.smsConfirmation = { code, expirationDate };
+    manDoc.smsConfirmation = { code, expirationDate, check };
 }
 
 async function enterPhoneNumber(ctx) {
@@ -82,21 +83,38 @@ async function enterPhoneNumber(ctx) {
 }
 
 async function enterCode(ctx) {
-    const { phoneNumber, smsCode } = ctx.request.body;
+    const { phoneNumber, smsCode, check } = ctx.request.body;
     let manDoc = await Manufacturer.findOne({ phoneNumber });
 
-    ctx.assert(phoneNumber && smsCode, 404, errorMessages.validationError());
+    ctx.assert(phoneNumber && smsCode && check, 404, errorMessages.validationError());
     ctx.assert(manDoc, 404, errorMessages.userNotFound(phoneNumber));
-    ctx.assert(manDoc.smsConfirmation.code, 404, errorMessages.smsCodeNotSent());
 
-    if (manDoc.smsConfirmation.code !== smsCode) {
-        ctx.body = { cause: "notMatch", message: errorMessages.smsCodeNotMatch() };
-        ctx.status = 403;
+    manDoc.findOneAndUpdate({ phoneNumber }, { $inc: { "smsConfirmation.attempts": 1 } });
+    const attempts = manDoc.smsConfirmation.attempts + 1;
+
+    if (!manDoc.smsConfirmation.code || manDoc.smsConfirmation.check === check) {
+        ctx.body = { cause: "notSent", message: errorMessages.smsCodeNotSent() };
+        ctx.status = 404;
         return;
     }
 
     if (Date.now() > manDoc.smsConfirmation.expirationDate.getTime()) {
         ctx.body = { cause: "expired", message: errorMessages.smsCodeExpired() };
+        ctx.status = 403;
+        return;
+    }
+
+    if (constants.SMS_CODE_MAX_TRY_COUNT < attempts) {
+        ctx.body = {
+            cause: "tooMany",
+            message: errorMessages.smsCodeExceededNumberOfAttempts(phoneNumber)
+        };
+        ctx.status = 403;
+        return;
+    }
+
+    if (manDoc.smsConfirmation.code !== smsCode) {
+        ctx.body = { cause: "notMatch", message: errorMessages.smsCodeNotMatch() };
         ctx.status = 403;
         return;
     }

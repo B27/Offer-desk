@@ -10,7 +10,7 @@ module.exports = {
     userNotFound(phoneNumber) {
         return `user with phone number ${phoneNumber} not found`;
     },
-    smsCodeExceededNumberOfTry(phoneNumber) {
+    smsCodeExceededNumberOfAttempts(phoneNumber) {
         return `number of attempts to enter sms code to user ${phoneNumber} overlimited`;
     },
 

@@ -55,7 +55,7 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
     }
 
     const sr = scan(eSchemaDescriptor);
-    console.log("scanned eSchemaDescriptor", sr);
+    // console.log("scanned eSchemaDescriptor", sr);
 
     function buildClearRequest(access, system) {
         return (query, user) => {
