@@ -36,11 +36,7 @@ module.exports = {
     smsConfirmation: {
         code: { type: String, system: true },
         expirationDate: { type: Date, system: true },
-        attempts: { type: Number, system: true, default: 0 },
-        // используется для того, чтобы проверять, сброшен ли код авторизации
-        // при каждом новом заросе на авторизацию в этом поле должно быть
-        // новое случайное число
-        check: { type: Number, system: true }
+        attempts: { type: Number, system: true, default: 0 }
     }
 };
 

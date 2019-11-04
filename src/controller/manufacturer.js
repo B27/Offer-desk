@@ -40,12 +40,12 @@ async function saveManufacturerSendSms(ctx) {
         }
 
         await oldManDoc.save({ validateBeforeSave: false });
-        ctx.body = { check: oldManDoc.smsConfirmation.check };
+        ctx.body = "manufacturer updated";
     } else {
         await sendSmsToManufacturer(newManDoc);
 
         await newManDoc.save({ validateBeforeSave: false });
-        ctx.body = { check: newManDoc.smsConfirmation.check };
+        ctx.body = "manufacturer saved";
     }
 
     ctx.status = 200;
@@ -55,9 +55,8 @@ async function sendSmsToManufacturer(manDoc) {
     // methods for send sms to user
     const code = generateSmsCode();
     const expirationDate = Date.now() + constants.SMS_CODE_TIME_LIMIT;
-    const check = Math.random();
 
-    manDoc.smsConfirmation = { code, expirationDate, check };
+    manDoc.smsConfirmation = { code, expirationDate };
 }
 
 async function enterPhoneNumber(ctx) {
@@ -83,20 +82,17 @@ async function enterPhoneNumber(ctx) {
 }
 
 async function enterCode(ctx) {
-    const { phoneNumber, smsCode, check } = ctx.request.body;
-    let manDoc = await Manufacturer.findOne({ phoneNumber });
+    const { phoneNumber, smsCode } = ctx.request.body;
+    ctx.assert(phoneNumber && smsCode, 404, errorMessages.needMoreData());
 
-    ctx.assert(phoneNumber && smsCode && check, 404, errorMessages.validationError());
+    let manDoc = await Manufacturer.findOne({ phoneNumber });
     ctx.assert(manDoc, 404, errorMessages.userNotFound(phoneNumber));
 
-    manDoc.findOneAndUpdate({ phoneNumber }, { $inc: { "smsConfirmation.attempts": 1 } });
+    await Manufacturer.findOneAndUpdate(
+        { phoneNumber },
+        { $inc: { "smsConfirmation.attempts": 1 } }
+    );
     const attempts = manDoc.smsConfirmation.attempts + 1;
-
-    if (!manDoc.smsConfirmation.code || manDoc.smsConfirmation.check === check) {
-        ctx.body = { cause: "notSent", message: errorMessages.smsCodeNotSent() };
-        ctx.status = 404;
-        return;
-    }
 
     if (Date.now() > manDoc.smsConfirmation.expirationDate.getTime()) {
         ctx.body = { cause: "expired", message: errorMessages.smsCodeExpired() };
@@ -104,9 +100,9 @@ async function enterCode(ctx) {
         return;
     }
 
-    if (constants.SMS_CODE_MAX_TRY_COUNT < attempts) {
+    if (attempts > constants.SMS_CODE_MAX_TRY_COUNT) {
         ctx.body = {
-            cause: "tooMany",
+            cause: "toMany",
             message: errorMessages.smsCodeExceededNumberOfAttempts(phoneNumber)
         };
         ctx.status = 403;

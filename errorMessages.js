@@ -22,6 +22,10 @@ module.exports = {
         return `validation error`;
     },
 
+    needMoreData() {
+        return `need more data`;
+    },
+
     smsCodeExpired() {
         return `sms code is expired`;
     },

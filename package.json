@@ -5,7 +5,7 @@
     "main": "index.js",
     "dependencies": {
         "@koa/cors": "3.0.0",
-        "@koa/router": "^8.0.2",
+        "@koa/router": "8.0.2",
         "email-validator": "2.0.4",
         "google-libphonenumber": "3.2.5",
         "jsonwebtoken": "8.5.1",
@@ -32,11 +32,11 @@
     },
     "homepage": "https://github.com/iliser/loader#readme",
     "devDependencies": {
+        "axios": "0.19.0",
         "eslint": "6.5.1",
-        "eslint-plugin-jest": "^23.0.2",
-        "eslint-plugin-prettier": "^3.1.1",
-        "jest": "^24.9.0",
-        "prettier": "^1.18.2",
-        "supertest": "^4.0.2"
+        "eslint-plugin-jest": "23.0.2",
+        "eslint-plugin-prettier": "3.1.1",
+        "jest": "24.9.0",
+        "prettier": "1.18.2"
     }
 }
