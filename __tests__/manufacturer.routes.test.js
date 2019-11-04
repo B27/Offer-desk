@@ -19,7 +19,8 @@ async function connectStart() {
     await Mongoose.connect(TESTCONNECTSTR, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useCreateIndex: true
+        useCreateIndex: true,
+        useFindAndModify: false
     });
 
     console.info("succefuly connected to mongo db");

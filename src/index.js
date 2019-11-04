@@ -12,7 +12,8 @@ async function ConnectToMongo() {
         await Mongoose.connect(CONNECTSTR, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            useCreateIndex: true
+            useCreateIndex: true,
+            useFindAndModify: false
         });
         console.info("succefuly connected to mongo db");
         startKoa();
