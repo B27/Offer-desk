@@ -3,11 +3,11 @@ const manufacturer = require("./eSchemaDescriptors/manufacturer");
 module.exports = em.eModel(
     "Manufacturer",
     em.eSchema(manufacturer, () => 2, {
-        getUpdateError: (u, id) => {
-            if (u.isAdmin) {
+        getUpdateError: (user, id) => {
+            if (user.isAdmin) {
                 return null;
             }
-            if (id.toString() !== u._id) {
+            if (id.toString() !== user.id) {
                 return "you can't modify another manufacturer info";
             }
             return null;

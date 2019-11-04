@@ -34,9 +34,9 @@ function registerCRUD(path, router, model) {
         )
         .patch(
             `/api/crud/${path}`,
-            dbConnector(async ({ _id, ...rest }, ctx) => {
+            dbConnector(async ({ id, ...rest }, ctx) => {
                 //findByIdAndUpdate does't call validation, because validation is mongoose middlewares
-                const doc = await model.findById(_id);
+                const doc = await model.findById(id);
                 ctx.assert(doc, 404, errmsg.documentNotFound());
                 doc.set({ ...rest });
                 const err = await doc.getUpdateError(ctx.state.user, doc._id);
@@ -53,8 +53,8 @@ function registerCRUD(path, router, model) {
 
         .delete(
             `/api/crud/${path}`,
-            dbConnector(async ({ _id }, ctx) => {
-                const doc = await model.findById(_id);
+            dbConnector(async ({ id }, ctx) => {
+                const doc = await model.findById(id);
                 ctx.assert(doc, 404, errmsg.documentNotFound());
                 const err = await doc.getDeleteError(ctx.state.user, doc._id);
                 ctx.assert(!err, 400, err);

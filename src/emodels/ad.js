@@ -6,7 +6,7 @@ module.exports = em.eModel(
     em.eSchema(ad, () => 2, {
         getPostError: function(user) {
             if (user.type === "manufacturer") {
-                if (this.manufacturer.toString() !== user._id) {
+                if (this.manufacturer.toString() !== user.id) {
                     return "You can't create ad as another manufacturer";
                 }
                 if (!user.isConfirmed) {
@@ -20,7 +20,7 @@ module.exports = em.eModel(
                 if (this.modifiedPaths().includes("manufacturer")) {
                     return "You can't change manufacturer after creation";
                 }
-                if (this.manufacturer.toString() !== user._id) {
+                if (this.manufacturer.toString() !== user.id) {
                     return "You don't own this ad";
                 }
             }
@@ -28,7 +28,7 @@ module.exports = em.eModel(
         },
         getDeleteError: function(user) {
             if (user.type === "manufacturer") {
-                if (this.manufacturer.toString() !== user._id) {
+                if (this.manufacturer.toString() !== user.id) {
                     return "You don't own this ad";
                 }
             }

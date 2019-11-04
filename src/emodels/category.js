@@ -6,10 +6,10 @@ const Ad = require("./ad")[0];
 
 module.exports = em.eModel(
     "Category",
-    em.eSchema(category, u => [READ, WRITE][+u.isAdmin], {
-        getPostError: u => [err.mustBeTheAdmin(), null][+u.isAdmin],
-        getDeleteError: async (u, id) => {
-            if (!u.isAdmin) {
+    em.eSchema(category, user => [READ, WRITE][+user.isAdmin], {
+        getPostError: user => [err.mustBeTheAdmin(), null][+user.isAdmin],
+        getDeleteError: async (user, id) => {
+            if (!user.isAdmin) {
                 return err.mustBeTheAdmin();
             }
             if (await Ad.findOne({ category: id })) {

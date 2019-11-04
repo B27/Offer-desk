@@ -35,9 +35,10 @@ async function saveManufacturerSendSms(ctx) {
 
         await sendSmsToManufacturer(oldManDoc);
 
-        for (const manField of Object.keys(manufacturerData)) {
-            oldManDoc[manField] = manufacturerData[manField];
-        }
+        // for (const manField of Object.keys(manufacturerData)) {
+        //     oldManDoc[manField] = manufacturerData[manField];
+        // }
+        oldManDoc.set(manufacturerData);
 
         await oldManDoc.save({ validateBeforeSave: false });
         ctx.body = "manufacturer updated";
@@ -70,12 +71,6 @@ async function enterPhoneNumber(ctx) {
                 : generateSmsCode()
         })
         .save();
-
-    // //Delete code after timeout
-    // setTimeout(
-    //     () => manufacturer.findOneAndUpdate({ phoneNumber }, { smsConfirmation: undefined }),
-    //     constants.SMS_CODE_TIME_LIMIT
-    // );
 
     ctx.status = 200;
     ctx.body = "OK";
@@ -115,8 +110,8 @@ async function enterCode(ctx) {
         return;
     }
 
-    const { _id } = manDoc;
-    const token = jwt.sign({ _id, type: "manufacturer" }, constants.JWTSECRET);
+    const { id } = manDoc;
+    const token = jwt.sign({ id, type: "manufacturer" }, constants.JWTSECRET);
     manDoc.isSmsConfirmed = true;
     await manDoc.save();
 

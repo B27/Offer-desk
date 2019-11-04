@@ -1,4 +1,6 @@
 const _ = require("lodash");
+const os = require("os");
+
 module.exports = {
     //build query from koa ctx
     dbConnector: (dbMethod, model) => async ctx => {
@@ -29,5 +31,7 @@ module.exports = {
             ctx.status = err.status || 500;
             ctx.body = { errmsg: err.message || err };
         }
-    }
+    },
+    fileName: path =>
+        os.platform() === "win32" ? path.win32.basename(path) : path.posix.basename(path)
 };
