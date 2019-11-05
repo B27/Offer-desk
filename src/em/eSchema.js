@@ -2,7 +2,7 @@ const Mongoose = require("mongoose");
 const ObjectId = Mongoose.Schema.Types.ObjectId;
 const _ = require("lodash");
 
-function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
+function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}, hooksArray = []) {
     function scan(schema, oldKey = undefined) {
         if (oldKey) {
             oldKey += ".";
@@ -107,6 +107,9 @@ function eBuilder(eSchemaDescriptor, defaultAccess, getErrors = {}) {
             await sr.autopopulate.reduce((acc, path) => acc.populate(path), doc).execPopulate();
         }
     });
+
+    hooksArray.forEach(({ hook, fn }) => schema.pre(hook, fn));
+
     return schema;
 }
 

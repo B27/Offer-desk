@@ -3,6 +3,7 @@ const fs = require("fs");
 const axios = require("axios").default;
 const errorMessages = require("../errorMessages");
 const [Category] = require("../src/emodels/category");
+const { UPLOADDIR } = require("../constants");
 
 function categoryTest() {
     describe("route /api/category", () => {
@@ -55,9 +56,14 @@ function categoryTest() {
             }
         }
 
-        beforeAll(() => initTests());
+        async function clearAfterTest() {
+            fs.unlinkSync(UPLOADDIR + "/" + imageNameInDb);
+            await Category.deleteOne({ _id: categoryDocId });
+        }
 
-        afterAll(() => Category.deleteOne({ _id: categoryDocId }));
+        beforeEach(() => initTests());
+
+        afterEach(() => clearAfterTest());
 
         test.each`
             categoryData                              | needSendId
@@ -85,74 +91,38 @@ function categoryTest() {
             }
         );
 
-        // test("if the number is not found in the database, then it must return a 'user not found' + phone number", async () => {
-        //     const categoryData = { phoneNumber: wrongPhoneNumber, smsCode };
-        //     const response = await axios.post(routeUpdateCategory, categoryData);
-        //     expect(response.status).toEqual(404);
-        //     expect(response.data).toEqual(errorMessages.userNotFound(wrongPhoneNumber));
-        // });
+        test.each`
+            categoryData
+            ${{ name: newName }}
+            ${{ image: newImageName }}
+            ${{ name: newName, image: newImageName }}
+        `(
+            "if there are not enough parameters ($categoryData), then should return 200",
+            async ({ categoryData }) => {
+                const form = new FormData();
+                categoryData.name && form.append("name", categoryData.name);
+                categoryData.image &&
+                    form.append("image", fs.createReadStream(__dirname + "/" + categoryData.image));
 
-        // test("if the SMS code is expired, then give an error", async () => {
-        //     categoryDoc.smsConfirmation = { code: smsCode, expirationDate: expiredDate };
-        //     await categoryDoc.save();
+                const reqParams = { id: categoryDocId };
 
-        //     const categoryData = { phoneNumber, smsCode };
+                const response = await axios.patch(routeCategory, form, {
+                    headers: { ...customHeaders, ...form.getHeaders() },
+                    params: reqParams
+                });
+                expect(response.status).toEqual(200);
 
-        //     const response = await axios.post(routeUpdateCategory, categoryData);
+                const { image } = response.data;
+                // если загрузить новую картинку, то её нужно удалить после теста
+                if (categoryData.image) {
+                    imageNameInDb = image;
+                }
 
-        //     expect(response.status).toEqual(403);
-        //     expect(response.data).toEqual({
-        //         cause: "expired",
-        //         message: errorMessages.smsCodeExpired()
-        //     });
-        // });
-
-        // test("if the number of attempts is exceeded, then should return an error", async () => {
-        //     categoryDoc.smsConfirmation = { code: smsCode, expirationDate: unexpiredDate };
-        //     await categoryDoc.save();
-
-        //     const categoryData = { phoneNumber, smsCode: wrongSmsCode };
-
-        //     for (let index = 0; index < SMS_CODE_MAX_TRY_COUNT; index++) {
-        //         await axios.post(routeUpdateCategory, categoryData);
-        //     }
-
-        //     const response = await axios.post(routeUpdateCategory, categoryData);
-
-        //     expect(response.status).toEqual(403);
-        //     expect(response.data).toEqual({
-        //         cause: "toMany",
-        //         message: errorMessages.smsCodeExceededNumberOfAttempts(phoneNumber)
-        //     });
-        // });
-
-        // test("if sms code not match, then should return an error", async () => {
-        //     categoryDoc.smsConfirmation = { code: smsCode, expirationDate: unexpiredDate };
-        //     await categoryDoc.save();
-
-        //     const categoryData = { phoneNumber, smsCode: wrongSmsCode };
-
-        //     const response = await axios.post(routeUpdateCategory, categoryData);
-
-        //     expect(response.status).toEqual(403);
-        //     expect(response.data).toEqual({
-        //         cause: "notMatch",
-        //         message: errorMessages.smsCodeNotMatch()
-        //     });
-        // });
-
-        // test("if everything is fine, then it should return the token and the name of the manufacturer", async () => {
-        //     categoryDoc.smsConfirmation = { code: smsCode, expirationDate: unexpiredDate };
-        //     await categoryDoc.save();
-
-        //     const categoryData = { phoneNumber, smsCode };
-
-        //     const response = await axios.post(routeUpdateCategory, categoryData);
-
-        //     expect(response.status).toEqual(200);
-        //     expect(response.data.name).toEqual(manName);
-        //     expect(response.data.token).toBeDefined();
-        // });
+                expect(response.data.name).toBeDefined();
+                expect(response.data.image).toBeDefined();
+                // expect(response.data).toEqual(errorMessages.needMoreData());
+            }
+        );
     });
 }
 
