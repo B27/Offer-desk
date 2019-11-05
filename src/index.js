@@ -1,7 +1,7 @@
 const Mongoose = require("mongoose");
 const startKoa = require("./entry");
 const fs = require("fs");
-const { UPLOADDIR, CONNECTSTR } = require("../constants");
+const { UPLOADDIR, CONNECTSTR, TESTCONNECTSTR } = require("../constants");
 
 if (!fs.existsSync(UPLOADDIR)) {
     fs.mkdirSync(UPLOADDIR, { recursive: true });

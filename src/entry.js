@@ -7,10 +7,10 @@ const cors = require("@koa/cors");
 const loginController = require("./controller/login");
 const { UPLOADDIR } = require("../constants");
 
-function startKoa() {
+function startKoa(port) {
     const router = Router();
     const app = new Koa();
-    const PORT = process.env.PORT || 3002;
+    const PORT = process.env.PORT || port || 3002;
 
     routerInit(router);
     routerInitWithModels(router);

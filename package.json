@@ -18,7 +18,7 @@
         "tape": "4.11.0"
     },
     "scripts": {
-        "server": "nodemon src/index.js ",
+        "server": "nodemon src/index.js",
         "test": "jest"
     },
     "repository": {
@@ -36,7 +36,9 @@
         "eslint": "6.6.0",
         "eslint-plugin-jest": "23.0.2",
         "eslint-plugin-prettier": "3.1.1",
+        "form-data": "^2.5.1",
         "jest": "24.9.0",
+        "jest-circus": "^24.9.0",
         "prettier": "1.18.2"
     }
 }

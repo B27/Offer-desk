@@ -1,3 +1,5 @@
+
+const path = require("path");
 const _ = require("lodash");
 const os = require("os");
 
@@ -32,6 +34,6 @@ module.exports = {
             ctx.body = { errmsg: err.message || err };
         }
     },
-    fileName: path =>
-        os.platform() === "win32" ? path.win32.basename(path) : path.posix.basename(path)
+    fileName: filePath =>
+        os.platform() === "win32" ? path.win32.basename(filePath) : path.posix.basename(filePath)
 };

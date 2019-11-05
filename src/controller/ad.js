@@ -3,9 +3,6 @@ const constants = require("../../constants");
 
 const [ad] = require("../emodels/ad");
 
-async function getPhoto() {}
-
-async function getPreview() {}
 
 async function postAd(ctx) {
     console.log("fields: ", ctx.request.body);
@@ -23,7 +20,5 @@ async function postAd(ctx) {
 }
 
 module.exports = {
-    getPhoto,
-    getPreview,
     postAd
 };
