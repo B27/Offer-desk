@@ -20,6 +20,7 @@ module.exports = function(router) {
 
         .post("/api/category", categoryController.addCategory)
         .patch("/api/category", categoryController.updateCategory)
+        .delete("/api/category", categoryController.removeCategory)
 
         .post("/api/manufacturer", manufacturerController.saveManufacturerSendSms);
 };

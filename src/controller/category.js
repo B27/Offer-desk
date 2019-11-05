@@ -1,8 +1,6 @@
-const fs = require("fs").promises;
 const errorMessages = require("../../errorMessages");
 const [Category] = require("../emodels/category");
-const { fileName } = require("../utils");
-const { UPLOADDIR } = require("../../constants");
+const { fileName, deleteUplodadedFile } = require("../utils");
 
 async function addCategory(ctx) {
     const { name: categoryName } = ctx.request.body;
@@ -28,7 +26,7 @@ async function updateCategory(ctx) {
 
     if (!(categoryId && (categoryName || image))) {
         if (image) {
-            await fs.unlink(`${UPLOADDIR}/${imageName}`);
+            deleteUplodadedFile(imageName);
         }
         ctx.body = errorMessages.needMoreData();
         ctx.status = 404;
@@ -37,8 +35,8 @@ async function updateCategory(ctx) {
 
     const categoryDoc = await Category.findById(categoryId);
 
-    if (image) {
-        await fs.unlink(`${UPLOADDIR}/${categoryDoc.image}`);
+    if (image && categoryDoc.image) {
+        deleteUplodadedFile(categoryDoc.image);
     }
 
     categoryName && categoryDoc.set("name", categoryName);
@@ -49,7 +47,26 @@ async function updateCategory(ctx) {
     ctx.status = 200;
 }
 
+async function removeCategory(ctx) {
+    const { id: categoryId } = ctx.query;
+
+    ctx.assert(ctx.state.user.isAdmin, 403, errorMessages.mustBeTheAdmin());
+    ctx.assert(categoryId, 404, errorMessages.needMoreData());
+
+    const categoryDoc = await Category.findById(categoryId);
+
+    if (categoryDoc.image) {
+        deleteUplodadedFile(categoryDoc.image);
+    }
+
+    categoryDoc.delete();
+
+    ctx.body = "OK";
+    ctx.status = 200;
+}
+
 module.exports = {
     addCategory,
-    updateCategory
+    updateCategory,
+    removeCategory
 };

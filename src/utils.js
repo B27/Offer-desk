@@ -1,7 +1,8 @@
-
 const path = require("path");
 const _ = require("lodash");
 const os = require("os");
+const fs = require("fs");
+const { UPLOADDIR } = require("../constants");
 
 module.exports = {
     //build query from koa ctx
@@ -34,6 +35,13 @@ module.exports = {
             ctx.body = { errmsg: err.message || err };
         }
     },
+
     fileName: filePath =>
-        os.platform() === "win32" ? path.win32.basename(filePath) : path.posix.basename(filePath)
+        os.platform() === "win32" ? path.win32.basename(filePath) : path.posix.basename(filePath),
+
+    deleteUplodadedFile: fileName => {
+        if (fs.existsSync(UPLOADDIR + "/" + fileName)) {
+            fs.unlinkSync(UPLOADDIR + "/" + fileName);
+        }
+    }
 };
