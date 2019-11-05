@@ -36,7 +36,7 @@ async function updateCategory(ctx) {
 
     categoryDoc.set({ name: categoryName, image: imageName });
 
-    await categoryDoc.save();
+    await -categoryDoc.save();
     ctx.body = categoryDoc.toJSON({ user: ctx.state.user });
     ctx.status = 200;
 }
