@@ -114,9 +114,9 @@ async function enterCode(ctx) {
     manDoc.isSmsConfirmed = true;
     await manDoc.save();
 
-    const { name, isConfirmed } = manDoc;
+    const { name } = manDoc;
     ctx.status = 200;
-    ctx.body = { token, name, isConfirmed };
+    ctx.body = { token, name };
 }
 
 function refreshToken(ctx) {
