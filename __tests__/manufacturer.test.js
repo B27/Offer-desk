@@ -17,35 +17,35 @@ function manufacturerTest() {
         return createRegion();
     });
 
+    const routeEnterSmsCode = "/api/enterSmsCode";
+
+    const manName = "testManufacturer";
+    const phoneNumber = "+7 902 234-45-23";
+    const wrongPhoneNumber = "+7 902 523-23-65";
+    const smsCode = "123567";
+    const wrongSmsCode = "653125";
+    const unexpiredDate = Date.now() + 24 * 60 * 60 * 1000;
+    const expiredDate = Date.now() - 24 * 60 * 60 * 1000;
+    let manufacturerDoc;
+
+    async function createManufacturer() {
+        const manufacturerData = {
+            phoneNumber,
+            feedbackPhoneNumber: "+7 905 234-35-23",
+            name: manName,
+            productionDescription: "test desctiption",
+            region: regionId,
+            isConfirmed: false,
+            isSmsConfirmed: false
+        };
+        manufacturerDoc = await Manufacturer.create(manufacturerData);
+    }
+
+    beforeEach(() => createManufacturer());
+
+    afterEach(() => Manufacturer.deleteOne({ phoneNumber }));
+
     describe("post /api/enterSmsCode", () => {
-        const routeEnterSmsCode = "/api/enterSmsCode";
-
-        const manName = "testManufacturer";
-        const phoneNumber = "+7 902 234-45-23";
-        const wrongPhoneNumber = "+7 902 523-23-65";
-        const smsCode = "123567";
-        const wrongSmsCode = "653125";
-        const unexpiredDate = Date.now() + 24 * 60 * 60 * 1000;
-        const expiredDate = Date.now() - 24 * 60 * 60 * 1000;
-        let manufacturerDoc;
-
-        async function createManufacturer() {
-            const manufacturerData = {
-                phoneNumber,
-                feedbackPhoneNumber: "+7 905 234-35-23",
-                name: manName,
-                productionDescription: "test desctiption",
-                region: regionId,
-                isConfirmed: false,
-                isSmsConfirmed: false
-            };
-            manufacturerDoc = await Manufacturer.create(manufacturerData);
-        }
-
-        beforeEach(() => createManufacturer());
-
-        afterEach(() => Manufacturer.deleteOne({ phoneNumber }));
-
         test.each`
             authorizationData
             ${{}}
@@ -127,6 +127,35 @@ function manufacturerTest() {
             expect(response.status).toEqual(200);
             expect(response.data.name).toEqual(manName);
             expect(response.data.token).toBeDefined();
+        });
+    });
+
+    describe("get /api/manufacturerCheckConfirmation", () => {
+        const routeCheckConfirm = "/api/manufacturerCheckConfirmation";
+
+        test("should return confirmStatus", async () => {
+            manufacturerDoc.smsConfirmation = { code: smsCode, expirationDate: unexpiredDate };
+            manufacturerDoc.isConfirmed = false;
+            await manufacturerDoc.save();
+
+            const authorizationData = { phoneNumber, smsCode };
+
+            const {
+                data: { token }
+            } = await axios.post(routeEnterSmsCode, authorizationData);
+
+            const customHeaders = { Authorization: `Bearer ${token}` };
+
+            let response = await axios.get(routeCheckConfirm, { headers: customHeaders });
+            expect(response.status).toEqual(200);
+            expect(response.data.isConfirmed).toBe(false);
+
+            manufacturerDoc.isConfirmed = true;
+            await manufacturerDoc.save();
+
+            response = await axios.get(routeCheckConfirm, { headers: customHeaders });
+            expect(response.status).toEqual(200);
+            expect(response.data.isConfirmed).toBe(true);
         });
     });
 }

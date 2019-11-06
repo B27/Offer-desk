@@ -22,5 +22,6 @@ module.exports = function(router) {
         .patch("/api/category", categoryController.updateCategory)
         .delete("/api/category", categoryController.removeCategory)
 
+        .get("/api/manufacturerCheckConfirmation", manufacturerController.checkConfirmation)
         .post("/api/manufacturer", manufacturerController.saveManufacturerSendSms);
 };

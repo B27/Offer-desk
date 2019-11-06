@@ -127,7 +127,23 @@ function refreshToken(ctx) {
     }
 }
 
+async function checkConfirmation(ctx) {
+    const { user } = ctx.state;
+
+    if (!user) {
+        ctx.body = errorMessages.needMoreData();
+        ctx.status = 404;
+        return;
+    }
+
+    const manDoc = await Manufacturer.findById(user.id);
+    const { isConfirmed } = manDoc;
+    ctx.body = { isConfirmed };
+    ctx.status = 200;
+}
+
 module.exports = {
+    checkConfirmation,
     saveManufacturerSendSms,
     refreshToken,
     enterPhoneNumber,
