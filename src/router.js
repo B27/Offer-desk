@@ -8,7 +8,7 @@ const loginController = require("./controller/login");
 module.exports = function(router) {
     router
         .get("/api/refreshToken", loginController.refreshToken)
-        // .post("/api/enterPhoneNumber", )
+        .post("/api/enterPhoneNumber", manufacturerController.enterPhoneNumber)
         .post("/api/enterSmsCode", manufacturerController.enterCode)
         .post("/api/adminSignIn", loginController.adminSignIn)
 

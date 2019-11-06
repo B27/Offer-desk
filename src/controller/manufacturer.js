@@ -40,12 +40,10 @@ async function saveManufacturerSendSms(ctx) {
         // }
         oldManDoc.set(manufacturerData);
 
-        await oldManDoc.save({ validateBeforeSave: false });
         ctx.body = "manufacturer updated";
     } else {
         await sendSmsToManufacturer(newManDoc);
 
-        await newManDoc.save({ validateBeforeSave: false });
         ctx.body = "manufacturer saved";
     }
 
@@ -58,19 +56,20 @@ async function sendSmsToManufacturer(manDoc) {
     const expirationDate = Date.now() + constants.SMS_CODE_TIME_LIMIT;
 
     manDoc.smsConfirmation = { code, expirationDate };
+    await manDoc.save({ validateBeforeSave: false });
 }
 
 async function enterPhoneNumber(ctx) {
     const { phoneNumber } = ctx.request.body;
-    let doc = await Manufacturer.findOne({ phoneNumber });
-    ctx.assert(doc, 404, errorMessages.userNotFound(phoneNumber));
-    await doc
-        .set({
-            smsConfirmation: process.env.development
-                ? constants.SMS_CODE_DEFAULT_DEV_CODE
-                : generateSmsCode()
-        })
-        .save();
+    let manDoc = await Manufacturer.findOne({ phoneNumber });
+
+    if (!manDoc) {
+        ctx.body = { cause: "notFound", message: errorMessages.userNotFound(phoneNumber) };
+        ctx.status = 404;
+        return;
+    }
+
+    await sendSmsToManufacturer(manDoc);
 
     ctx.status = 200;
     ctx.body = "OK";
@@ -115,9 +114,9 @@ async function enterCode(ctx) {
     manDoc.isSmsConfirmed = true;
     await manDoc.save();
 
-    const { name } = manDoc;
+    const { name, isConfirmed } = manDoc;
     ctx.status = 200;
-    ctx.body = { token, name };
+    ctx.body = { token, name, isConfirmed };
 }
 
 function refreshToken(ctx) {
