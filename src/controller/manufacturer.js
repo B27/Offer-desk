@@ -35,9 +35,6 @@ async function saveManufacturerSendSms(ctx) {
 
         await sendSmsToManufacturer(oldManDoc);
 
-        // for (const manField of Object.keys(manufacturerData)) {
-        //     oldManDoc[manField] = manufacturerData[manField];
-        // }
         oldManDoc.set(manufacturerData);
 
         ctx.body = "manufacturer updated";
@@ -131,8 +128,8 @@ async function checkConfirmation(ctx) {
     const { user } = ctx.state;
 
     if (!user) {
-        ctx.body = errorMessages.needMoreData();
-        ctx.status = 404;
+        ctx.body = errorMessages.notAuthorized();
+        ctx.status = 401;
         return;
     }
 

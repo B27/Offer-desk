@@ -43,5 +43,11 @@ module.exports = {
         if (fs.existsSync(UPLOADDIR + "/" + fileName)) {
             fs.unlinkSync(UPLOADDIR + "/" + fileName);
         }
+    },
+
+    deleteUnusedFile: filePath => {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
     }
 };

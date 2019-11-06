@@ -8,22 +8,23 @@ module.exports = {
     category: {
         type: ObjectId,
         required: true,
-        ref: "Category",
-        autopopulate: true
+        ref: "Category"
+        // autopopulate: true
     },
     photos: { type: [String], file: { path: "photos", array: true } },
-    price: { type: Number },
+    preview: { type: String },
+    price: { type: String },
     manufacturer: {
         type: ObjectId,
         required: true,
-        ref: "Manufacturer",
-        autopopulate: true
+        ref: "Manufacturer"
+        // autopopulate: true
     },
     region: {
         type: ObjectId,
         required: true,
-        ref: "Region",
-        autopopulate: true
+        ref: "Region"
+        // autopopulate: true
     },
     phoneNumber: {
         ...phoneNumberSchemaDescriptor,

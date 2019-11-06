@@ -4,6 +4,7 @@ const KoaBody = require("koa-body");
 const routerInitWithModels = require("./emodels/buildModels");
 const routerInit = require("./router");
 const cors = require("@koa/cors");
+const unuseDeleticul = require("./middleware/unuseDeleticul");
 const loginController = require("./controller/login");
 const { UPLOADDIR } = require("../constants");
 
@@ -22,6 +23,7 @@ function startKoa(port) {
             formidable: { multiples: true, uploadDir: UPLOADDIR }
         })
     );
+    app.use(unuseDeleticul);
     app.use(loginController.authenticate);
     app.use(router.routes());
 

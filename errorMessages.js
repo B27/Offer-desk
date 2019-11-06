@@ -22,6 +22,10 @@ module.exports = {
         return `validation error`;
     },
 
+    notAuthorized() {
+        return `not authorized`;
+    },
+
     needMoreData() {
         return `need more data`;
     },

@@ -25,9 +25,6 @@ async function updateCategory(ctx) {
     ctx.assert(ctx.state.user.isAdmin, 403, errorMessages.mustBeTheAdmin());
 
     if (!(categoryId && (categoryName || image))) {
-        if (image) {
-            deleteUplodadedFile(imageName);
-        }
         ctx.body = errorMessages.needMoreData();
         ctx.status = 404;
         return;
