@@ -76,14 +76,17 @@ async function enterCode(ctx) {
     const { phoneNumber, smsCode } = ctx.request.body;
     ctx.assert(phoneNumber && smsCode, 404, errorMessages.needMoreData());
 
-    let manDoc = await Manufacturer.findOne({ phoneNumber });
-    ctx.assert(manDoc, 404, errorMessages.userNotFound(phoneNumber));
+    const manExists = await Manufacturer.exists({ phoneNumber });
+    ctx.assert(manExists, 404, errorMessages.userNotFound(phoneNumber));
 
-    await Manufacturer.findOneAndUpdate(
+    const manDoc = await Manufacturer.findOneAndUpdate(
         { phoneNumber },
-        { $inc: { "smsConfirmation.attempts": 1 } }
+        { $inc: { "smsConfirmation.attempts": 1 } },
+        {
+            new: true
+        }
     );
-    const attempts = manDoc.smsConfirmation.attempts + 1;
+    const attempts = manDoc.smsConfirmation.attempts;
 
     if (Date.now() > manDoc.smsConfirmation.expirationDate.getTime()) {
         ctx.body = { cause: "expired", message: errorMessages.smsCodeExpired() };
@@ -108,8 +111,13 @@ async function enterCode(ctx) {
 
     const { id } = manDoc;
     const token = jwt.sign({ id, type: "manufacturer" }, constants.JWTSECRET);
-    manDoc.isSmsConfirmed = true;
-    await manDoc.save();
+
+    const res = await manDoc.updateOne({
+        $unset: { smsConfirmation: "" },
+        $set: { isSmsConfirmed: true }
+    });
+
+    ctx.assert(res.nModified === 1, 500, errorMessages.errorDuringUpdate());
 
     const { name } = manDoc;
     ctx.status = 200;
@@ -134,8 +142,14 @@ async function checkConfirmation(ctx) {
     }
 
     const manDoc = await Manufacturer.findById(user.id);
-    const { isConfirmed } = manDoc;
-    ctx.body = { isConfirmed };
+
+    if (!manDoc.isConfirmed) {
+        ctx.body = { cause: "unconfirmed", message: errorMessages.userNeedConfirmation() };
+        ctx.status = 403;
+        return;
+    }
+
+    ctx.body = "OK";
     ctx.status = 200;
 }
 

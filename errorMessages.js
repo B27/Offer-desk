@@ -7,9 +7,18 @@ module.exports = {
         return "user needs confirmation from administrator";
     },
 
+    errorDuringUpdate() {
+        return `error during update`;
+    },
+
     userNotFound(phoneNumber) {
         return `user with phone number ${phoneNumber} not found`;
     },
+
+    notEnoughPreview() {
+        return `not enough preview`;
+    },
+
     smsCodeExceededNumberOfAttempts(phoneNumber) {
         return `number of attempts to enter sms code to user ${phoneNumber} overlimited`;
     },
