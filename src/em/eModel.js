@@ -9,12 +9,12 @@ function registerCRUD(path, router, model) {
             dbConnector(
                 (query, ctx) =>
                     model
-                        .find({ ...query, createdAt: { $lt: new Date(ctx.requestOptions.__last_date || Date.now()) } })
+                        .find(query)
                         .limit(+ctx.requestOptions.__limit || 100)
                         .skip(+ctx.requestOptions.__skip || 0)
                         .sort(ctx.requestOptions.__sort || ""),
                 model,
-                false //don't need clear request
+                true //don't need clear request
             )
         )
         .post(
