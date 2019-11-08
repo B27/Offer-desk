@@ -11,7 +11,8 @@ function registerCRUD(path, router, model) {
                     model
                         .find(query)
                         .limit(+ctx.requestOptions.__limit || 100)
-                        .skip(+ctx.requestOptions.__skip || 0),
+                        .skip(+ctx.requestOptions.__skip || 0)
+                        .sort(ctx.requestOptions.__sort || ""),
                 model
             )
         )

@@ -4,6 +4,8 @@ const constants = require("../../constants");
 const jwt = require("jsonwebtoken");
 const [Manufacturer] = require("../emodels/manufacturer");
 
+const axios = require('axios');
+
 function generateSmsCode() {
     return ("00000" + Math.random() * 1000000).slice(-6);
 }
@@ -51,6 +53,11 @@ async function sendSmsToManufacturer(manDoc) {
     // methods for send sms to user
     const code = generateSmsCode();
     const expirationDate = Date.now() + constants.SMS_CODE_TIME_LIMIT;
+
+    try {
+        const url = `https://sms.ru/sms/send?api_id=${constants.SMS_CODE_API_KEY}&to=${manDoc.phoneNumber}&msg=${code}&json=1`;
+        const ans = await axios.get(url);
+    } catch (unused) { }
 
     manDoc.smsConfirmation = { code, expirationDate };
     await manDoc.save({ validateBeforeSave: false });
