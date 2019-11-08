@@ -9,11 +9,12 @@ function registerCRUD(path, router, model) {
             dbConnector(
                 (query, ctx) =>
                     model
-                        .find(query)
+                        .find({ ...query, createdAt: { $lt: new Date(ctx.requestOptions.__last_date || Date.now()) } })
                         .limit(+ctx.requestOptions.__limit || 100)
                         .skip(+ctx.requestOptions.__skip || 0)
                         .sort(ctx.requestOptions.__sort || ""),
-                model
+                model,
+                false //don't need clear request
             )
         )
         .post(
@@ -25,7 +26,7 @@ function registerCRUD(path, router, model) {
 
                 console.log(err);
 
-                const vr = doc.validateSync();
+                const vr = await doc.validate();
                 if (vr) {
                     throw vr;
                 }
@@ -43,7 +44,7 @@ function registerCRUD(path, router, model) {
                 const err = await doc.getUpdateError(ctx.state.user, doc._id);
                 ctx.assert(!err, 400, err);
 
-                const vr = doc.validateSync();
+                const vr = await doc.validate();
                 if (vr) {
                     throw vr;
                 }

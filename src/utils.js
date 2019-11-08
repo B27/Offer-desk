@@ -6,7 +6,7 @@ const { UPLOADDIR } = require("../constants");
 
 module.exports = {
     //build query from koa ctx
-    dbConnector: (dbMethod, model) => async ctx => {
+    dbConnector: (dbMethod, model, needClear = true) => async ctx => {
         let request = { ...ctx.request.body, ...ctx.query };
         const user = ctx.state.user;
         console.log(request);
@@ -18,7 +18,7 @@ module.exports = {
             }
         }
         ctx.requestOptions = options;
-        request = model.clearRequest(request, user);
+        if (needClear) request = model.clearRequest(request, user);
         console.log(request);
         try {
             const res = await dbMethod(request, ctx);
